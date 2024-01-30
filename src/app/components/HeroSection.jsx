@@ -7,24 +7,36 @@ import Link from 'next/link'
 import { useEffect } from "react"
 const HeroSection = () => {
     const [isPlaying, setIsPlaying] = useState(false);
-    const audioElementRef = useRef(new Audio('/images/song1.mp3'));
+    const audioElementRef = useRef(null);
+
+    useEffect(() => {
+        // Check if window is defined (it's not defined during server-side rendering)
+        if (typeof window !== 'undefined') {
+            audioElementRef.current = new Audio('/images/song1.mp3');
+        }
+    }, []);
+
     const handleImageClick = () => {
         const audioElement = audioElementRef.current;
-        if (isPlaying) {
-          audioElement.pause();
-        } else {
-          audioElement.play();
+        if (audioElement) {
+            if (isPlaying) {
+                audioElement.pause();
+            } else {
+                audioElement.play();
+            }
+            setIsPlaying(!isPlaying);
         }
-    
-        setIsPlaying(!isPlaying);
-      };
-      useEffect(() => {
+    };
+
+    useEffect(() => {
         const audioElement = audioElementRef.current;
         return () => {
-          audioElement.pause();
-          audioElement.currentTime = 0;
+            if (audioElement) {
+                audioElement.pause();
+                audioElement.currentTime = 0;
+            }
         };
-      }, []);
+    }, []);
     return (
         <section className="lg:py-16">
             <div className="grid grid-cols-1 sm:grid-cols-12">
